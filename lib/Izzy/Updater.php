@@ -16,7 +16,7 @@ class Updater
 
 	public function run() {
 		foreach ($this->exchanges as $exchange) {
-			echo $exchange->getName() . PHP_EOL;
+			$exchange->loadDriver();
 		}
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace Izzy\Models;
 
+use Izzy\Interfaces\IExchange;
 use Izzy\Models\Base\Exchange as BaseExchange;
 
 /**
@@ -15,5 +16,15 @@ use Izzy\Models\Base\Exchange as BaseExchange;
  */
 class Exchange extends BaseExchange
 {
+	private ?IExchange $driver;
 
+	public function loadDriver() {
+		$driver = $this->getName();
+		$className = "\\Izzy\\Exchanges\\$driver";
+		if(!class_exists($className)) {
+			throw new \Exception("Driver class not found: $driver");
+		}
+        $this->driver = new $className();
+		return $this->driver;
+	}
 }
