@@ -1,0 +1,9 @@
+{
+  "require": {
+    "propel/propel": "~2.0@beta",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {"Izzy\\": "lib/Izzy/"}
+  }
+}
