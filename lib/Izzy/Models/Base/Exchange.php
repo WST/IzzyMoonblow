@@ -22,7 +22,7 @@ use Propel\Runtime\Propel;
  *
  *
  *
- * @package    propel.generator.Izzy/Models.Base
+ * @package    propel.generator.Izzy.Models.Base
  */
 abstract class Exchange implements ActiveRecordInterface
 {

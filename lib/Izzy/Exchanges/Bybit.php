@@ -2,7 +2,7 @@
 
 namespace Izzy\Exchanges;
 
-class Bybit extends AbstractExchange
+class Bybit extends AbstractExchangeDriver
 {
 	protected string $exchangeName = 'Bybit';
 }

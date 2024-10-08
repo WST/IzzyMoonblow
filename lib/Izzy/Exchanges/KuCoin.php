@@ -2,7 +2,7 @@
 
 namespace Izzy\Exchanges;
 
-class KuCoin extends AbstractExchange
+class KuCoin extends AbstractExchangeDriver
 {
 	protected string $exchangeName = 'KuCoin';
 }

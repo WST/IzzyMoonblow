@@ -2,19 +2,21 @@
 
 namespace Izzy\Exchanges;
 
-use Izzy\Interfaces\IExchange;
+use Izzy\Interfaces\IExchangeDriver;
 
 /**
  * Абстрактный класс криптобиржи.
  * Содержит общую для всех криптобирж логику.
  */
-abstract class AbstractExchange implements IExchange
+abstract class AbstractExchangeDriver implements IExchangeDriver
 {
 	protected string $exchangeName = '';
 
 	public function __construct() {
 		$exchangeName = $this->getExchangeName();
-		echo "Exchange driver for $exchangeName loaded successfully.\n";
+		$updater = \Izzy\Updater::getInstance();
+		$logger = $updater->getLogger();
+		$logger->info("Драйвер для биржи $exchangeName загружен успешно");
 	}
 
 	public function getExchangeName(): string {

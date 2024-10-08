@@ -2,7 +2,7 @@
 
 namespace Izzy\Exchanges;
 
-class Gate extends AbstractExchange
+class Gate extends AbstractExchangeDriver
 {
 	protected string $exchangeName = 'Gate';
 }

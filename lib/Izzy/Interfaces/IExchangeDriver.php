@@ -5,7 +5,7 @@ namespace Izzy\Interfaces;
 /**
  * Интерфейс криптобиржи
  */
-interface IExchange
+interface IExchangeDriver
 {
 	// Обновить информацию с биржи
 	public function update(): void;
