@@ -12,26 +12,35 @@ abstract class AbstractExchangeDriver implements IExchangeDriver
 {
 	protected string $exchangeName = '';
 
+	protected $updater;
+
+	protected $logger;
+
 	public function __construct() {
 		$exchangeName = $this->getExchangeName();
-		$updater = \Izzy\Updater::getInstance();
-		$logger = $updater->getLogger();
-		$logger->info("Драйвер для биржи $exchangeName загружен успешно");
+		$this->updater = \Izzy\Updater::getInstance();
+		$this->logger = $this->updater->getLogger();
+		$this->logger->info("Драйвер для биржи $exchangeName загружен успешно");
 	}
 
 	public function getExchangeName(): string {
 		return $this->exchangeName;
 	}
 
-	public function update(): void {
-		// TODO: Implement update() method.
+	public function run(): int {
+		$pid = pcntl_fork();
+		if($pid) {
+			return $pid;
+		}
+
+		while(true) {
+			$this->update();
+            sleep(5);
+		}
+		return 0;
 	}
 
-	public function connect(): bool {
-		// TODO: Implement connect() method.
-	}
-
-	public function disconnect(): void {
-		// TODO: Implement disconnect() method.
-	}
+	protected function log($message) {
+        $this->logger->info($message);
+    }
 }

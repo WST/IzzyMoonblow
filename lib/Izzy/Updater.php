@@ -2,6 +2,7 @@
 
 namespace Izzy;
 
+use Izzy\Interfaces\IExchangeDriver;
 use Izzy\Models\ExchangeQuery;
 use Monolog\Logger;
 use Propel\Runtime\Propel;
@@ -18,17 +19,31 @@ class Updater extends ConsoleApplication
 	}
 
 	public function run() {
-		foreach($this->exchanges as $exchange) {
-			try {
-				$exchange->loadDriver();
-			} catch (\Exception $e) {
-				$this->logger->error("Ошибка загрузки драйвера для биржи {$exchange->getName()}: {$e->getMessage()}");
-    			continue;
-			}
-		}
-
 		// Отключимся от базы данных перед разделением
 		Propel::getServiceContainer()->closeConnections();
+
+		// Запускаем обновляторы бирж
+		$status = $this->runExchangeUpdaters();
+		die($status);
+	}
+
+	private function runExchangeUpdaters() {
+		$updaters = [];
+
+		/** @var IExchangeDriver $exchange */
+		foreach($this->exchanges as $exchange) {
+			$driverName = $exchange->getDriverName();
+			$driver = new $driverName();
+			$updaters[] = $driver->run();
+			unset($driver);
+		}
+
+		foreach ($updaters as $updater) {
+			$status = NULL;
+			pcntl_waitpid($updater, $status);
+		}
+
+		return 0;
 	}
 
 	public static function getInstance(): Updater {

@@ -2,14 +2,15 @@
 
 namespace Izzy\Exchanges;
 
+use Izzy\Exchanges\AbstractExchangeDriver;
 use Izzy\Money;
 
-class KuCoin extends AbstractExchangeDriver
+class BingX extends AbstractExchangeDriver
 {
 	protected string $exchangeName = __CLASS__;
 
 	public function getTotalBalance(): Money {
-
+		// TODO: Implement getTotalBalance() method.
 	}
 
 	public function update(): void {

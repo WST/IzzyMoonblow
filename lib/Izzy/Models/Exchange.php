@@ -16,15 +16,10 @@ use Izzy\Models\Base\Exchange as BaseExchange;
  */
 class Exchange extends BaseExchange
 {
-	private ?IExchangeDriver $driver;
-
-	public function loadDriver() {
-		$driver = $this->getName();
-		$className = "\\Izzy\\Exchanges\\$driver";
-		if(!class_exists($className)) {
-			throw new \Exception("Драйвер не найден: $driver");
-		}
-        $this->driver = new $className();
-		return $this->driver;
-	}
+	/**
+	 * @return string
+	 */
+	public function getDriverName(): string {
+		return "\\Izzy\\Exchanges\\{$this->getName()}";
+    }
 }

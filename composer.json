@@ -2,7 +2,9 @@
   "require": {
     "propel/propel": "~2.0@beta",
     "ext-pdo": "*",
-    "monolog/monolog": "^3.7"
+    "monolog/monolog": "^3.7",
+    "bramus/monolog-colored-line-formatter": "~3.1",
+    "ext-pcntl": "*"
   },
   "autoload": {
     "psr-4": {"Izzy\\": "lib/Izzy/"}
