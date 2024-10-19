@@ -2,20 +2,21 @@
 
 namespace Izzy\Models\Base;
 
-use Exception;
+use \Exception;
+use \PDO;
 use Izzy\Models\ExchangeQuery as ChildExchangeQuery;
 use Izzy\Models\Map\ExchangeTableMap;
-use PDO;
+use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use Propel\Runtime\Propel;
 
 /**
  * Base class that represents a row from the 'exchanges' table.
@@ -76,6 +77,35 @@ abstract class Exchange implements ActiveRecordInterface
     protected $enabled;
 
     /**
+     * The value for the balance field.
+     *
+     * Note: this column has a database default value of: 0.0
+     * @var        float|null
+     */
+    protected $balance;
+
+    /**
+     * The value for the key field.
+     *
+     * @var        string|null
+     */
+    protected $key;
+
+    /**
+     * The value for the secret field.
+     *
+     * @var        string|null
+     */
+    protected $secret;
+
+    /**
+     * The value for the password field.
+     *
+     * @var        string|null
+     */
+    protected $password;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -92,6 +122,7 @@ abstract class Exchange implements ActiveRecordInterface
     public function applyDefaultValues(): void
     {
         $this->enabled = false;
+        $this->balance = 0.0;
     }
 
     /**
@@ -353,6 +384,46 @@ abstract class Exchange implements ActiveRecordInterface
     }
 
     /**
+     * Get the [balance] column value.
+     *
+     * @return float|null
+     */
+    public function getBalance()
+    {
+        return $this->balance;
+    }
+
+    /**
+     * Get the [key] column value.
+     *
+     * @return string|null
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * Get the [secret] column value.
+     *
+     * @return string|null
+     */
+    public function getSecret()
+    {
+        return $this->secret;
+    }
+
+    /**
+     * Get the [password] column value.
+     *
+     * @return string|null
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
      * Set the value of [name] column.
      *
      * @param string $v New value
@@ -401,6 +472,86 @@ abstract class Exchange implements ActiveRecordInterface
     }
 
     /**
+     * Set the value of [balance] column.
+     *
+     * @param float|null $v New value
+     * @return $this The current object (for fluent API support)
+     */
+    public function setBalance($v)
+    {
+        if ($v !== null) {
+            $v = (float) $v;
+        }
+
+        if ($this->balance !== $v) {
+            $this->balance = $v;
+            $this->modifiedColumns[ExchangeTableMap::COL_BALANCE] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the value of [key] column.
+     *
+     * @param string|null $v New value
+     * @return $this The current object (for fluent API support)
+     */
+    public function setKey($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->key !== $v) {
+            $this->key = $v;
+            $this->modifiedColumns[ExchangeTableMap::COL_KEY] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the value of [secret] column.
+     *
+     * @param string|null $v New value
+     * @return $this The current object (for fluent API support)
+     */
+    public function setSecret($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->secret !== $v) {
+            $this->secret = $v;
+            $this->modifiedColumns[ExchangeTableMap::COL_SECRET] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the value of [password] column.
+     *
+     * @param string|null $v New value
+     * @return $this The current object (for fluent API support)
+     */
+    public function setPassword($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->password !== $v) {
+            $this->password = $v;
+            $this->modifiedColumns[ExchangeTableMap::COL_PASSWORD] = true;
+        }
+
+        return $this;
+    }
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -411,6 +562,10 @@ abstract class Exchange implements ActiveRecordInterface
     public function hasOnlyDefaultValues(): bool
     {
             if ($this->enabled !== false) {
+                return false;
+            }
+
+            if ($this->balance !== 0.0) {
                 return false;
             }
 
@@ -446,6 +601,18 @@ abstract class Exchange implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ExchangeTableMap::translateFieldName('Enabled', TableMap::TYPE_PHPNAME, $indexType)];
             $this->enabled = (null !== $col) ? (boolean) $col : null;
 
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ExchangeTableMap::translateFieldName('Balance', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->balance = (null !== $col) ? (float) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ExchangeTableMap::translateFieldName('Key', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->key = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ExchangeTableMap::translateFieldName('Secret', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->secret = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ExchangeTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->password = (null !== $col) ? (string) $col : null;
+
             $this->resetModified();
             $this->setNew(false);
 
@@ -453,7 +620,7 @@ abstract class Exchange implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = ExchangeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ExchangeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Izzy\\Models\\Exchange'), 0, $e);
@@ -524,8 +691,8 @@ abstract class Exchange implements ActiveRecordInterface
      * @param ConnectionInterface $con
      * @return void
      * @throws \Propel\Runtime\Exception\PropelException
-     * @see \Izzy\Models\Exchange::setDeleted()
-     * @see \Izzy\Models\Exchange::isDeleted()
+     * @see Exchange::setDeleted()
+     * @see Exchange::isDeleted()
      */
     public function delete(?ConnectionInterface $con = null): void
     {
@@ -657,6 +824,18 @@ abstract class Exchange implements ActiveRecordInterface
         if ($this->isColumnModified(ExchangeTableMap::COL_ENABLED)) {
             $modifiedColumns[':p' . $index++]  = 'enabled';
         }
+        if ($this->isColumnModified(ExchangeTableMap::COL_BALANCE)) {
+            $modifiedColumns[':p' . $index++]  = 'balance';
+        }
+        if ($this->isColumnModified(ExchangeTableMap::COL_KEY)) {
+            $modifiedColumns[':p' . $index++]  = 'key';
+        }
+        if ($this->isColumnModified(ExchangeTableMap::COL_SECRET)) {
+            $modifiedColumns[':p' . $index++]  = 'secret';
+        }
+        if ($this->isColumnModified(ExchangeTableMap::COL_PASSWORD)) {
+            $modifiedColumns[':p' . $index++]  = 'password';
+        }
 
         $sql = sprintf(
             'INSERT INTO exchanges (%s) VALUES (%s)',
@@ -674,6 +853,22 @@ abstract class Exchange implements ActiveRecordInterface
                         break;
                     case 'enabled':
                         $stmt->bindValue($identifier, (int) $this->enabled, PDO::PARAM_INT);
+
+                        break;
+                    case 'balance':
+                        $stmt->bindValue($identifier, $this->balance, PDO::PARAM_STR);
+
+                        break;
+                    case 'key':
+                        $stmt->bindValue($identifier, $this->key, PDO::PARAM_STR);
+
+                        break;
+                    case 'secret':
+                        $stmt->bindValue($identifier, $this->secret, PDO::PARAM_STR);
+
+                        break;
+                    case 'password':
+                        $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
 
                         break;
                 }
@@ -737,6 +932,18 @@ abstract class Exchange implements ActiveRecordInterface
             case 1:
                 return $this->getEnabled();
 
+            case 2:
+                return $this->getBalance();
+
+            case 3:
+                return $this->getKey();
+
+            case 4:
+                return $this->getSecret();
+
+            case 5:
+                return $this->getPassword();
+
             default:
                 return null;
         } // switch()
@@ -766,6 +973,10 @@ abstract class Exchange implements ActiveRecordInterface
         $result = [
             $keys[0] => $this->getName(),
             $keys[1] => $this->getEnabled(),
+            $keys[2] => $this->getBalance(),
+            $keys[3] => $this->getKey(),
+            $keys[4] => $this->getSecret(),
+            $keys[5] => $this->getPassword(),
         ];
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -813,6 +1024,18 @@ abstract class Exchange implements ActiveRecordInterface
             case 1:
                 $this->setEnabled($value);
                 break;
+            case 2:
+                $this->setBalance($value);
+                break;
+            case 3:
+                $this->setKey($value);
+                break;
+            case 4:
+                $this->setSecret($value);
+                break;
+            case 5:
+                $this->setPassword($value);
+                break;
         } // switch()
 
         return $this;
@@ -844,6 +1067,18 @@ abstract class Exchange implements ActiveRecordInterface
         }
         if (array_key_exists($keys[1], $arr)) {
             $this->setEnabled($arr[$keys[1]]);
+        }
+        if (array_key_exists($keys[2], $arr)) {
+            $this->setBalance($arr[$keys[2]]);
+        }
+        if (array_key_exists($keys[3], $arr)) {
+            $this->setKey($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setSecret($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setPassword($arr[$keys[5]]);
         }
 
         return $this;
@@ -893,6 +1128,18 @@ abstract class Exchange implements ActiveRecordInterface
         }
         if ($this->isColumnModified(ExchangeTableMap::COL_ENABLED)) {
             $criteria->add(ExchangeTableMap::COL_ENABLED, $this->enabled);
+        }
+        if ($this->isColumnModified(ExchangeTableMap::COL_BALANCE)) {
+            $criteria->add(ExchangeTableMap::COL_BALANCE, $this->balance);
+        }
+        if ($this->isColumnModified(ExchangeTableMap::COL_KEY)) {
+            $criteria->add(ExchangeTableMap::COL_KEY, $this->key);
+        }
+        if ($this->isColumnModified(ExchangeTableMap::COL_SECRET)) {
+            $criteria->add(ExchangeTableMap::COL_SECRET, $this->secret);
+        }
+        if ($this->isColumnModified(ExchangeTableMap::COL_PASSWORD)) {
+            $criteria->add(ExchangeTableMap::COL_PASSWORD, $this->password);
         }
 
         return $criteria;
@@ -984,6 +1231,10 @@ abstract class Exchange implements ActiveRecordInterface
     {
         $copyObj->setName($this->getName());
         $copyObj->setEnabled($this->getEnabled());
+        $copyObj->setBalance($this->getBalance());
+        $copyObj->setKey($this->getKey());
+        $copyObj->setSecret($this->getSecret());
+        $copyObj->setPassword($this->getPassword());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1022,6 +1273,10 @@ abstract class Exchange implements ActiveRecordInterface
     {
         $this->name = null;
         $this->enabled = null;
+        $this->balance = null;
+        $this->key = null;
+        $this->secret = null;
+        $this->password = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();

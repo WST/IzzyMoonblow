@@ -4,6 +4,9 @@ namespace Izzy\Exchanges;
 
 use Izzy\Money;
 
+/**
+ * Драйвер для работы с биржей KuCoin
+ */
 class KuCoin extends AbstractExchangeDriver
 {
 	protected string $exchangeName = __CLASS__;
@@ -12,7 +15,7 @@ class KuCoin extends AbstractExchangeDriver
 
 	}
 
-	public function update(): void {
+	public function update(): int {
 		// TODO: Implement update() method.
 	}
 

@@ -33,11 +33,14 @@ abstract class AbstractExchangeDriver implements IExchangeDriver
 			return $pid;
 		}
 
-		while(true) {
-			$this->update();
-            sleep(5);
+		if(!$this->connect()) {
+			return -1;
 		}
-		return 0;
+
+		while(true) {
+			$timeout = $this->update();
+            sleep($timeout);
+		}
 	}
 
 	protected function log($message) {

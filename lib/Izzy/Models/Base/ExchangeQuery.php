@@ -2,26 +2,34 @@
 
 namespace Izzy\Models\Base;
 
-use Exception;
+use \Exception;
+use \PDO;
 use Izzy\Models\Exchange as ChildExchange;
 use Izzy\Models\ExchangeQuery as ChildExchangeQuery;
 use Izzy\Models\Map\ExchangeTableMap;
-use PDO;
+use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Propel\Runtime\Propel;
 
 /**
  * Base class that represents a query for the `exchanges` table.
  *
  * @method     ChildExchangeQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildExchangeQuery orderByEnabled($order = Criteria::ASC) Order by the enabled column
+ * @method     ChildExchangeQuery orderByBalance($order = Criteria::ASC) Order by the balance column
+ * @method     ChildExchangeQuery orderByKey($order = Criteria::ASC) Order by the key column
+ * @method     ChildExchangeQuery orderBySecret($order = Criteria::ASC) Order by the secret column
+ * @method     ChildExchangeQuery orderByPassword($order = Criteria::ASC) Order by the password column
  *
  * @method     ChildExchangeQuery groupByName() Group by the name column
  * @method     ChildExchangeQuery groupByEnabled() Group by the enabled column
+ * @method     ChildExchangeQuery groupByBalance() Group by the balance column
+ * @method     ChildExchangeQuery groupByKey() Group by the key column
+ * @method     ChildExchangeQuery groupBySecret() Group by the secret column
+ * @method     ChildExchangeQuery groupByPassword() Group by the password column
  *
  * @method     ChildExchangeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildExchangeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -36,12 +44,20 @@ use Propel\Runtime\Propel;
  *
  * @method     ChildExchange|null findOneByName(string $name) Return the first ChildExchange filtered by the name column
  * @method     ChildExchange|null findOneByEnabled(boolean $enabled) Return the first ChildExchange filtered by the enabled column
+ * @method     ChildExchange|null findOneByBalance(float $balance) Return the first ChildExchange filtered by the balance column
+ * @method     ChildExchange|null findOneByKey(string $key) Return the first ChildExchange filtered by the key column
+ * @method     ChildExchange|null findOneBySecret(string $secret) Return the first ChildExchange filtered by the secret column
+ * @method     ChildExchange|null findOneByPassword(string $password) Return the first ChildExchange filtered by the password column
  *
  * @method     ChildExchange requirePk($key, ?ConnectionInterface $con = null) Return the ChildExchange by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildExchange requireOne(?ConnectionInterface $con = null) Return the first ChildExchange matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildExchange requireOneByName(string $name) Return the first ChildExchange filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildExchange requireOneByEnabled(boolean $enabled) Return the first ChildExchange filtered by the enabled column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildExchange requireOneByBalance(float $balance) Return the first ChildExchange filtered by the balance column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildExchange requireOneByKey(string $key) Return the first ChildExchange filtered by the key column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildExchange requireOneBySecret(string $secret) Return the first ChildExchange filtered by the secret column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildExchange requireOneByPassword(string $password) Return the first ChildExchange filtered by the password column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildExchange[]|Collection find(?ConnectionInterface $con = null) Return ChildExchange objects based on current ModelCriteria
  * @psalm-method Collection&\Traversable<ChildExchange> find(?ConnectionInterface $con = null) Return ChildExchange objects based on current ModelCriteria
@@ -50,6 +66,14 @@ use Propel\Runtime\Propel;
  * @psalm-method Collection&\Traversable<ChildExchange> findByName(string|array<string> $name) Return ChildExchange objects filtered by the name column
  * @method     ChildExchange[]|Collection findByEnabled(boolean|array<boolean> $enabled) Return ChildExchange objects filtered by the enabled column
  * @psalm-method Collection&\Traversable<ChildExchange> findByEnabled(boolean|array<boolean> $enabled) Return ChildExchange objects filtered by the enabled column
+ * @method     ChildExchange[]|Collection findByBalance(float|array<float> $balance) Return ChildExchange objects filtered by the balance column
+ * @psalm-method Collection&\Traversable<ChildExchange> findByBalance(float|array<float> $balance) Return ChildExchange objects filtered by the balance column
+ * @method     ChildExchange[]|Collection findByKey(string|array<string> $key) Return ChildExchange objects filtered by the key column
+ * @psalm-method Collection&\Traversable<ChildExchange> findByKey(string|array<string> $key) Return ChildExchange objects filtered by the key column
+ * @method     ChildExchange[]|Collection findBySecret(string|array<string> $secret) Return ChildExchange objects filtered by the secret column
+ * @psalm-method Collection&\Traversable<ChildExchange> findBySecret(string|array<string> $secret) Return ChildExchange objects filtered by the secret column
+ * @method     ChildExchange[]|Collection findByPassword(string|array<string> $password) Return ChildExchange objects filtered by the password column
+ * @psalm-method Collection&\Traversable<ChildExchange> findByPassword(string|array<string> $password) Return ChildExchange objects filtered by the password column
  *
  * @method     ChildExchange[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ?ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  * @psalm-method \Propel\Runtime\Util\PropelModelPager&\Traversable<ChildExchange> paginate($page = 1, $maxPerPage = 10, ?ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -149,7 +173,7 @@ abstract class ExchangeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT name, enabled FROM exchanges WHERE name = :p0';
+        $sql = 'SELECT name, enabled, balance, key, secret, password FROM exchanges WHERE name = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_STR);
@@ -296,6 +320,133 @@ abstract class ExchangeQuery extends ModelCriteria
         }
 
         $this->addUsingAlias(ExchangeTableMap::COL_ENABLED, $enabled, $comparison);
+
+        return $this;
+    }
+
+    /**
+     * Filter the query on the balance column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBalance(1234); // WHERE balance = 1234
+     * $query->filterByBalance(array(12, 34)); // WHERE balance IN (12, 34)
+     * $query->filterByBalance(array('min' => 12)); // WHERE balance > 12
+     * </code>
+     *
+     * @param mixed $balance The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function filterByBalance($balance = null, ?string $comparison = null)
+    {
+        if (is_array($balance)) {
+            $useMinMax = false;
+            if (isset($balance['min'])) {
+                $this->addUsingAlias(ExchangeTableMap::COL_BALANCE, $balance['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($balance['max'])) {
+                $this->addUsingAlias(ExchangeTableMap::COL_BALANCE, $balance['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        $this->addUsingAlias(ExchangeTableMap::COL_BALANCE, $balance, $comparison);
+
+        return $this;
+    }
+
+    /**
+     * Filter the query on the key column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByKey('fooValue');   // WHERE key = 'fooValue'
+     * $query->filterByKey('%fooValue%', Criteria::LIKE); // WHERE key LIKE '%fooValue%'
+     * $query->filterByKey(['foo', 'bar']); // WHERE key IN ('foo', 'bar')
+     * </code>
+     *
+     * @param string|string[] $key The value to use as filter.
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function filterByKey($key = null, ?string $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($key)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        $this->addUsingAlias(ExchangeTableMap::COL_KEY, $key, $comparison);
+
+        return $this;
+    }
+
+    /**
+     * Filter the query on the secret column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySecret('fooValue');   // WHERE secret = 'fooValue'
+     * $query->filterBySecret('%fooValue%', Criteria::LIKE); // WHERE secret LIKE '%fooValue%'
+     * $query->filterBySecret(['foo', 'bar']); // WHERE secret IN ('foo', 'bar')
+     * </code>
+     *
+     * @param string|string[] $secret The value to use as filter.
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function filterBySecret($secret = null, ?string $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($secret)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        $this->addUsingAlias(ExchangeTableMap::COL_SECRET, $secret, $comparison);
+
+        return $this;
+    }
+
+    /**
+     * Filter the query on the password column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPassword('fooValue');   // WHERE password = 'fooValue'
+     * $query->filterByPassword('%fooValue%', Criteria::LIKE); // WHERE password LIKE '%fooValue%'
+     * $query->filterByPassword(['foo', 'bar']); // WHERE password IN ('foo', 'bar')
+     * </code>
+     *
+     * @param string|string[] $password The value to use as filter.
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function filterByPassword($password = null, ?string $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($password)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        $this->addUsingAlias(ExchangeTableMap::COL_PASSWORD, $password, $comparison);
 
         return $this;
     }

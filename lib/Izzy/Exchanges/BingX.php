@@ -5,6 +5,9 @@ namespace Izzy\Exchanges;
 use Izzy\Exchanges\AbstractExchangeDriver;
 use Izzy\Money;
 
+/**
+ * Драйвер для работы с биржей BingX
+ */
 class BingX extends AbstractExchangeDriver
 {
 	protected string $exchangeName = __CLASS__;
@@ -13,7 +16,7 @@ class BingX extends AbstractExchangeDriver
 		// TODO: Implement getTotalBalance() method.
 	}
 
-	public function update(): void {
+	public function update(): int {
 		// TODO: Implement update() method.
 	}
 

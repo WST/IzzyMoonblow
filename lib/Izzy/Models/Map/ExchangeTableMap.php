@@ -4,13 +4,15 @@ namespace Izzy\Models\Map;
 
 use Izzy\Models\Exchange;
 use Izzy\Models\ExchangeQuery;
+use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\DataFetcherInterface;
+use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Propel\Runtime\Propel;
 
 
 /**
@@ -31,7 +33,7 @@ class ExchangeTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    public const CLASS_NAME = 'Izzy/Models.Map.ExchangeTableMap';
+    public const CLASS_NAME = 'Izzy.Models.Map.ExchangeTableMap';
 
     /**
      * The default database name for this class
@@ -56,12 +58,12 @@ class ExchangeTableMap extends TableMap
     /**
      * A class that can be returned by this tableMap
      */
-    public const CLASS_DEFAULT = 'Izzy/Models.Exchange';
+    public const CLASS_DEFAULT = 'Izzy.Models.Exchange';
 
     /**
      * The total number of columns
      */
-    public const NUM_COLUMNS = 2;
+    public const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -71,7 +73,7 @@ class ExchangeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    public const NUM_HYDRATE_COLUMNS = 2;
+    public const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the name field
@@ -82,6 +84,26 @@ class ExchangeTableMap extends TableMap
      * the column name for the enabled field
      */
     public const COL_ENABLED = 'exchanges.enabled';
+
+    /**
+     * the column name for the balance field
+     */
+    public const COL_BALANCE = 'exchanges.balance';
+
+    /**
+     * the column name for the key field
+     */
+    public const COL_KEY = 'exchanges.key';
+
+    /**
+     * the column name for the secret field
+     */
+    public const COL_SECRET = 'exchanges.secret';
+
+    /**
+     * the column name for the password field
+     */
+    public const COL_PASSWORD = 'exchanges.password';
 
     /**
      * The default string format for model objects of the related table
@@ -97,11 +119,11 @@ class ExchangeTableMap extends TableMap
      * @var array<string, mixed>
      */
     protected static $fieldNames = [
-        self::TYPE_PHPNAME       => ['Name', 'Enabled', ],
-        self::TYPE_CAMELNAME     => ['name', 'enabled', ],
-        self::TYPE_COLNAME       => [ExchangeTableMap::COL_NAME, ExchangeTableMap::COL_ENABLED, ],
-        self::TYPE_FIELDNAME     => ['name', 'enabled', ],
-        self::TYPE_NUM           => [0, 1, ]
+        self::TYPE_PHPNAME       => ['Name', 'Enabled', 'Balance', 'Key', 'Secret', 'Password', ],
+        self::TYPE_CAMELNAME     => ['name', 'enabled', 'balance', 'key', 'secret', 'password', ],
+        self::TYPE_COLNAME       => [ExchangeTableMap::COL_NAME, ExchangeTableMap::COL_ENABLED, ExchangeTableMap::COL_BALANCE, ExchangeTableMap::COL_KEY, ExchangeTableMap::COL_SECRET, ExchangeTableMap::COL_PASSWORD, ],
+        self::TYPE_FIELDNAME     => ['name', 'enabled', 'balance', 'key', 'secret', 'password', ],
+        self::TYPE_NUM           => [0, 1, 2, 3, 4, 5, ]
     ];
 
     /**
@@ -113,11 +135,11 @@ class ExchangeTableMap extends TableMap
      * @var array<string, mixed>
      */
     protected static $fieldKeys = [
-        self::TYPE_PHPNAME       => ['Name' => 0, 'Enabled' => 1, ],
-        self::TYPE_CAMELNAME     => ['name' => 0, 'enabled' => 1, ],
-        self::TYPE_COLNAME       => [ExchangeTableMap::COL_NAME => 0, ExchangeTableMap::COL_ENABLED => 1, ],
-        self::TYPE_FIELDNAME     => ['name' => 0, 'enabled' => 1, ],
-        self::TYPE_NUM           => [0, 1, ]
+        self::TYPE_PHPNAME       => ['Name' => 0, 'Enabled' => 1, 'Balance' => 2, 'Key' => 3, 'Secret' => 4, 'Password' => 5, ],
+        self::TYPE_CAMELNAME     => ['name' => 0, 'enabled' => 1, 'balance' => 2, 'key' => 3, 'secret' => 4, 'password' => 5, ],
+        self::TYPE_COLNAME       => [ExchangeTableMap::COL_NAME => 0, ExchangeTableMap::COL_ENABLED => 1, ExchangeTableMap::COL_BALANCE => 2, ExchangeTableMap::COL_KEY => 3, ExchangeTableMap::COL_SECRET => 4, ExchangeTableMap::COL_PASSWORD => 5, ],
+        self::TYPE_FIELDNAME     => ['name' => 0, 'enabled' => 1, 'balance' => 2, 'key' => 3, 'secret' => 4, 'password' => 5, ],
+        self::TYPE_NUM           => [0, 1, 2, 3, 4, 5, ]
     ];
 
     /**
@@ -140,6 +162,34 @@ class ExchangeTableMap extends TableMap
         'ExchangeTableMap::COL_ENABLED' => 'ENABLED',
         'COL_ENABLED' => 'ENABLED',
         'exchanges.enabled' => 'ENABLED',
+        'Balance' => 'BALANCE',
+        'Exchange.Balance' => 'BALANCE',
+        'balance' => 'BALANCE',
+        'exchange.balance' => 'BALANCE',
+        'ExchangeTableMap::COL_BALANCE' => 'BALANCE',
+        'COL_BALANCE' => 'BALANCE',
+        'exchanges.balance' => 'BALANCE',
+        'Key' => 'KEY',
+        'Exchange.Key' => 'KEY',
+        'key' => 'KEY',
+        'exchange.key' => 'KEY',
+        'ExchangeTableMap::COL_KEY' => 'KEY',
+        'COL_KEY' => 'KEY',
+        'exchanges.key' => 'KEY',
+        'Secret' => 'SECRET',
+        'Exchange.Secret' => 'SECRET',
+        'secret' => 'SECRET',
+        'exchange.secret' => 'SECRET',
+        'ExchangeTableMap::COL_SECRET' => 'SECRET',
+        'COL_SECRET' => 'SECRET',
+        'exchanges.secret' => 'SECRET',
+        'Password' => 'PASSWORD',
+        'Exchange.Password' => 'PASSWORD',
+        'password' => 'PASSWORD',
+        'exchange.password' => 'PASSWORD',
+        'ExchangeTableMap::COL_PASSWORD' => 'PASSWORD',
+        'COL_PASSWORD' => 'PASSWORD',
+        'exchanges.password' => 'PASSWORD',
     ];
 
     /**
@@ -156,11 +206,15 @@ class ExchangeTableMap extends TableMap
         $this->setPhpName('Exchange');
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Izzy\\Models\\Exchange');
-        $this->setPackage('Izzy\\Models');
+        $this->setPackage('Izzy.Models');
         $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('name', 'Name', 'VARCHAR', true, 24, null);
         $this->addColumn('enabled', 'Enabled', 'BOOLEAN', false, 1, false);
+        $this->addColumn('balance', 'Balance', 'FLOAT', false, null, 0.0);
+        $this->addColumn('key', 'Key', 'VARCHAR', false, 255, null);
+        $this->addColumn('secret', 'Secret', 'VARCHAR', false, 255, null);
+        $this->addColumn('password', 'Password', 'VARCHAR', false, 255, null);
     }
 
     /**
@@ -316,9 +370,17 @@ class ExchangeTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(ExchangeTableMap::COL_NAME);
             $criteria->addSelectColumn(ExchangeTableMap::COL_ENABLED);
+            $criteria->addSelectColumn(ExchangeTableMap::COL_BALANCE);
+            $criteria->addSelectColumn(ExchangeTableMap::COL_KEY);
+            $criteria->addSelectColumn(ExchangeTableMap::COL_SECRET);
+            $criteria->addSelectColumn(ExchangeTableMap::COL_PASSWORD);
         } else {
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.enabled');
+            $criteria->addSelectColumn($alias . '.balance');
+            $criteria->addSelectColumn($alias . '.key');
+            $criteria->addSelectColumn($alias . '.secret');
+            $criteria->addSelectColumn($alias . '.password');
         }
     }
 
@@ -339,9 +401,17 @@ class ExchangeTableMap extends TableMap
         if (null === $alias) {
             $criteria->removeSelectColumn(ExchangeTableMap::COL_NAME);
             $criteria->removeSelectColumn(ExchangeTableMap::COL_ENABLED);
+            $criteria->removeSelectColumn(ExchangeTableMap::COL_BALANCE);
+            $criteria->removeSelectColumn(ExchangeTableMap::COL_KEY);
+            $criteria->removeSelectColumn(ExchangeTableMap::COL_SECRET);
+            $criteria->removeSelectColumn(ExchangeTableMap::COL_PASSWORD);
         } else {
             $criteria->removeSelectColumn($alias . '.name');
             $criteria->removeSelectColumn($alias . '.enabled');
+            $criteria->removeSelectColumn($alias . '.balance');
+            $criteria->removeSelectColumn($alias . '.key');
+            $criteria->removeSelectColumn($alias . '.secret');
+            $criteria->removeSelectColumn($alias . '.password');
         }
     }
 

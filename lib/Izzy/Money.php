@@ -22,4 +22,8 @@ class Money {
 	public function __toString(): string {
 		return $this->format();
 	}
+
+	public function setAmount(float $amount) {
+		$this->amount = $amount;
+	}
 }

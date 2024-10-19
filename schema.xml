@@ -2,5 +2,9 @@
 	<table name="exchanges" phpName="Exchange">
 		<column name="name" type="varchar" size="24" required="true" primaryKey="true" />
 		<column name="enabled" type="boolean" phpType="boolean" defaultValue="false" />
+		<column name="balance" type="float" phpType="float" defaultValue="0.0" />
+		<column name="key" type="varchar" size="255" required="false" />
+		<column name="secret" type="varchar" size="255" required="false" />
+		<column name="password" type="varchar" size="255" required="false" />
 	</table>
 </database>
