@@ -2,7 +2,9 @@
 
 namespace Izzy\Exchanges;
 
+use Izzy\Database;
 use Izzy\Interfaces\IExchangeDriver;
+use Izzy\Money;
 
 /**
  * Абстрактный класс криптобиржи.
@@ -12,15 +14,15 @@ abstract class AbstractExchangeDriver implements IExchangeDriver
 {
 	protected string $exchangeName = '';
 
-	protected $updater;
+	protected array $dbRow = [];
 
-	protected $logger;
+	protected Database $database;
 
-	public function __construct() {
+	public function __construct(array $dbRow) {
+		$this->dbRow = $dbRow;
 		$exchangeName = $this->getExchangeName();
-		$this->updater = \Izzy\Updater::getInstance();
-		$this->logger = $this->updater->getLogger();
-		$this->logger->info("Драйвер для биржи $exchangeName загружен успешно");
+		$this->database = new Database("/home/ilya/projects/IzzyMoonblow/config/database.php");
+		$this->log("Драйвер для биржи $exchangeName загружен успешно");
 	}
 
 	public function getExchangeName(): string {
@@ -37,13 +39,21 @@ abstract class AbstractExchangeDriver implements IExchangeDriver
 			return -1;
 		}
 
+		$this->database->connect();
+
 		while(true) {
 			$timeout = $this->update();
             sleep($timeout);
 		}
 	}
 
+	protected function setBalance(?Money $balance = null) {
+		if(is_null($balance)) return;
+		$this->database->setExchangeBalance($this->exchangeName, $balance);
+	}
+
 	protected function log($message) {
-        $this->logger->info($message);
+        //$this->logger->info($message);
+		echo "$message\n";
     }
 }

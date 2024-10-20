@@ -9,18 +9,14 @@ use Izzy\Money;
  */
 class KuCoin extends AbstractExchangeDriver
 {
-	protected string $exchangeName = __CLASS__;
-
-	public function getTotalBalance(): Money {
-
-	}
+	protected string $exchangeName = 'KuCoin';
 
 	public function update(): int {
-		// TODO: Implement update() method.
+		return 10;
 	}
 
 	public function connect(): bool {
-		// TODO: Implement connect() method.
+		return false;
 	}
 
 	public function disconnect(): void {

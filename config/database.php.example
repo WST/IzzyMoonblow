@@ -1,0 +1,8 @@
+<?php
+
+return [
+	'host' => 'localhost',
+	'database' => 'izzy_php',
+	'username' => 'izzy',
+	'password' => '******',
+];

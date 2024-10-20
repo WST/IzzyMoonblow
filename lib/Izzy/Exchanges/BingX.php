@@ -10,18 +10,14 @@ use Izzy\Money;
  */
 class BingX extends AbstractExchangeDriver
 {
-	protected string $exchangeName = __CLASS__;
-
-	public function getTotalBalance(): Money {
-		// TODO: Implement getTotalBalance() method.
-	}
+	protected string $exchangeName = 'BingX';
 
 	public function update(): int {
-		// TODO: Implement update() method.
+		return 10;
 	}
 
 	public function connect(): bool {
-		// TODO: Implement connect() method.
+		return false;
 	}
 
 	public function disconnect(): void {

@@ -11,16 +11,19 @@ class Updater extends ConsoleApplication
 {
 	private $exchanges;
 
+	private Database $database;
+
 	public function __construct() {
 		parent::__construct('updater');
-		$this->exchanges = ExchangeQuery::create()
-			->orderByName()
-			->find();
+		$this->database = new Database("/home/ilya/projects/IzzyMoonblow/config/database.php");
+		$this->database->connect();
+		$this->exchanges = $this->database->listExchanges();
 	}
 
 	public function run() {
 		// Отключимся от базы данных перед разделением
-		Propel::getServiceContainer()->closeConnections();
+		$this->database->close();
+		unset($this->database);
 
 		// Запускаем обновляторы бирж
 		$status = $this->runExchangeUpdaters();
@@ -31,11 +34,8 @@ class Updater extends ConsoleApplication
 		$updaters = [];
 
 		/** @var IExchangeDriver $exchange */
-		foreach($this->exchanges as $exchange) {
-			$driverName = $exchange->getDriverName();
-			$driver = new $driverName();
-			$updaters[] = $driver->run();
-			unset($driver);
+		foreach($this->exchanges as $exchangeName => $exchange) {
+			$updaters[] = $exchange->run();
 		}
 
 		foreach ($updaters as $updater) {
@@ -49,7 +49,7 @@ class Updater extends ConsoleApplication
 	public static function getInstance(): Updater {
 		static $instance = null;
 		if (is_null($instance)) {
-			$instance = new Updater();
+			$instance = new self();
 		}
 		return $instance;
 	}
