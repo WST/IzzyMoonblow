@@ -23,4 +23,8 @@ class BingX extends AbstractExchangeDriver
 	public function disconnect(): void {
 		// TODO: Implement disconnect() method.
 	}
+
+	public function refreshAccountBalance() {
+
+	}
 }

@@ -18,10 +18,12 @@ abstract class AbstractExchangeDriver implements IExchangeDriver
 
 	protected Database $database;
 
+	protected int $iteration = 0;
+
 	public function __construct(array $dbRow) {
 		$this->dbRow = $dbRow;
 		$exchangeName = $this->getExchangeName();
-		$this->database = new Database("/home/ilya/projects/IzzyMoonblow/config/database.php");
+		$this->database = new Database(IZZY_CONFIG. "/database.php");
 		$this->log("Драйвер для биржи $exchangeName загружен успешно");
 	}
 
@@ -50,6 +52,21 @@ abstract class AbstractExchangeDriver implements IExchangeDriver
 	protected function setBalance(?Money $balance = null) {
 		if(is_null($balance)) return;
 		$this->database->setExchangeBalance($this->exchangeName, $balance);
+	}
+
+	public function update(): int {
+		$this->log("Обновление информации для биржи {$this->exchangeName}");
+
+		// Каждые 10 циклов обновляем актуальный баланс
+		if($this->iteration % 10 == 0) {
+			$this->refreshAccountBalance();
+		}
+
+		// Инкрементируем число итераций
+		$this->iteration ++;
+
+		// Засыпаем на 5 секунд между циклами работы
+		return 5;
 	}
 
 	protected function log($message) {

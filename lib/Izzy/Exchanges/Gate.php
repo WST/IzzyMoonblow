@@ -13,8 +13,6 @@ class Gate extends AbstractExchangeDriver
 {
 	protected string $exchangeName = "Gate";
 
-	private int $iteration = 0;
-
 	private $config;
 
 	private $walletApi;
@@ -23,21 +21,6 @@ class Gate extends AbstractExchangeDriver
 		$info = $this->walletApi->getTotalBalance(['currency' => 'USDT']);
 		$value = $info->getTotal()->getAmount();
 		$this->setBalance(new Money($value));
-	}
-
-	public function update(): int {
-		$this->log("Обновление информации для биржи Gate");
-
-		// Каждые 10 циклов обновляем актуальный баланс
-		if($this->iteration % 10 == 0) {
-			$this->refreshAccountBalance();
-		}
-
-		// Инкрементируем число итераций
-		$this->iteration ++;
-
-		// Засыпаем на 5 секунд между циклами работы
-		return 5;
 	}
 
 	public function connect(): bool {

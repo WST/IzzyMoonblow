@@ -14,8 +14,6 @@ class Bybit extends AbstractExchangeDriver
 {
 	protected string $exchangeName = 'Bybit';
 
-	private int $iteration = 0;
-
 	// Общий баланс всех средств на бирже, пересчитанный в доллары
 	private ?Money $totalBalance = null;
 
@@ -37,7 +35,7 @@ class Bybit extends AbstractExchangeDriver
 		// TODO: Implement disconnect() method.
 	}
 
-	private function refreshAccountBalance() {
+	protected function refreshAccountBalance() {
 		$this->log("Обновляем баланс кошелька на {$this->exchangeName}");
 
 		$params = ['accountType' => AccountType::UNIFIED];
@@ -50,20 +48,5 @@ class Bybit extends AbstractExchangeDriver
 		}
 
 		$this->setBalance($this->totalBalance);
-	}
-
-	public function update(): int {
-		$this->log("Обновление информации для биржи Bybit");
-
-		// Каждые 10 циклов обновляем актуальный баланс
-		if($this->iteration % 10 == 0) {
-			$this->refreshAccountBalance();
-		}
-
-		// Инкрементируем число итераций
-		$this->iteration ++;
-
-		// Засыпаем на 5 секунд между циклами работы
-		return 5;
 	}
 }

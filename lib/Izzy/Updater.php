@@ -15,7 +15,7 @@ class Updater extends ConsoleApplication
 
 	public function __construct() {
 		parent::__construct('updater');
-		$this->database = new Database("/home/ilya/projects/IzzyMoonblow/config/database.php");
+		$this->database = new Database(IZZY_CONFIG . "/database.php");
 		$this->database->connect();
 		$this->exchanges = $this->database->listExchanges();
 	}
