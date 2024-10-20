@@ -2,6 +2,7 @@
 
 namespace Izzy\Exchanges;
 
+use ByBit\SDK\Exceptions\HttpException;
 use Izzy\Money;
 use ByBit\SDK\ByBitApi;
 use ByBit\SDK\Enums\AccountType;
@@ -37,16 +38,18 @@ class Bybit extends AbstractExchangeDriver
 
 	protected function refreshAccountBalance() {
 		$this->log("Обновляем баланс кошелька на {$this->exchangeName}");
-
-		$params = ['accountType' => AccountType::UNIFIED];
-		$info = $this->api->accountApi()->getWalletBalance($params);
-		$value = @ (float)$info['list'][0]['totalEquity'];
-		if(is_null($this->totalBalance)) {
-			$this->totalBalance = new Money($value);
-		} else {
-			$this->totalBalance->setAmount($value);
+		try {
+			$params = ['accountType' => AccountType::UNIFIED];
+			$info = $this->api->accountApi()->getWalletBalance($params);
+			$value = @ (float)$info['list'][0]['totalEquity'];
+			if (is_null($this->totalBalance)) {
+				$this->totalBalance = new Money($value);
+			} else {
+				$this->totalBalance->setAmount($value);
+			}
+			$this->setBalance($this->totalBalance);
+		} catch (HttpException $exception) {
+			$this->log("Не удалось обновить баланс кошелька на {$this->exchangeName}");
 		}
-
-		$this->setBalance($this->totalBalance);
 	}
 }
